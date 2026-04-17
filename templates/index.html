@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedType Pro - Typing Speed Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Your existing CSS here - unchanged */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            padding: 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #1a2a6c;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #1a2a6c, #b21f1f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .difficulty-btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .difficulty-btn.active {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .difficulty-btn.easy {
+            background: linear-gradient(to right, #28a745, #20c997);
+            color: white;
+        }
+
+        .difficulty-btn.medium {
+            background: linear-gradient(to right, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .difficulty-btn.hard {
+            background: linear-gradient(to right, #dc3545, #b21f1f);
+            color: white;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            background: linear-gradient(to right, #1a2a6c, #4a569d);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .text-display {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            min-height: 150px;
+            font-size: 1.4rem;
+            line-height: 1.8;
+            color: #333;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .text-display.hard {
+            font-size: 1.2rem;
+        }
+
+        .text-display span {
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .text-display span.correct {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .text-display span.incorrect {
+            color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            text-decoration: underline;
+        }
+
+        .text-display span.current {
+            background-color: #d0ebff;
+            border-radius: 3px;
+        }
+
+        .text-display span.current::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #1a73e8;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        #typing-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.4rem;
+            border: 2px solid #dee2e6;
+            border-radius: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+            background-color: #f8f9fa;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        #typing-input:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+        }
+
+        .input-label {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+            transition: all 0.3s;
+            font-size: 1.4rem;
+        }
+
+        #typing-input:focus + .input-label,
+        #typing-input:not(:placeholder-shown) + .input-label {
+            top: -12px;
+            left: 15px;
+            font-size: 1rem;
+            background: white;
+            padding: 0 8px;
+            color: #1a73e8;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 18px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #start-btn {
+            background: linear-gradient(to right, #28a745, #20c997);
+            color: white;
+        }
+
+        #reset-btn {
+            background: linear-gradient(to right, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        #new-text-btn {
+            background: linear-gradient(to right, #1a73e8, #4a569d);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            background: linear-gradient(to right, #4a569d, #1a2a6c);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            display: none;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+        }
+
+        .result-stat {
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .result-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #20c997, #28a745);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .instructions {
+            background-color: #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+            color: #495057;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .instructions h3 {
+            color: #1a2a6c;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .history-container {
+            background-color: #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+            color: #495057;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+
+        .history-container h3 {
+            color: #1a2a6c;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        #history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-wpm {
+            font-weight: bold;
+            color: #1a2a6c;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .stats-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .result-stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .difficulty-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-keyboard"></i> SpeedType Pro</h1>
+            <p class="subtitle">Test your typing speed with persistent history</p>
+        </header>
+
+        <div class="difficulty-selector">
+            <div class="difficulty-btn easy active" data-level="easy">Easy</div>
+            <div class="difficulty-btn medium" data-level="medium">Medium</div>
+            <div class="difficulty-btn hard" data-level="hard">Hard</div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat">
+                <div class="stat-value" id="wpm">0</div>
+                <div class="stat-label">Words Per Minute</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="accuracy">100%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="timer">60</div>
+                <div class="stat-label">Seconds Left</div>
+            </div>
+        </div>
+
+        <div class="text-display" id="text-display">
+            <!-- Text will be loaded here -->
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="typing-input" placeholder=" " autocomplete="off">
+            <label class="input-label">Start typing here...</label>
+        </div>
+
+        <div class="controls">
+            <button id="start-btn">
+                <i class="fas fa-play"></i> Start Test
+            </button>
+            <button id="reset-btn" disabled>
+                <i class="fas fa-redo"></i> Reset
+            </button>
+            <button id="new-text-btn">
+                <i class="fas fa-sync"></i> New Text
+            </button>
+        </div>
+
+        <div class="result-container" id="result-container">
+            <h2 class="result-title">Test Complete!</h2>
+            <div class="result-stats">
+                <div class="result-stat">
+                    <div class="result-value" id="final-wpm">0</div>
+                    <div class="result-label">WPM</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-value" id="final-accuracy">0%</div>
+                    <div class="result-label">Accuracy</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-value" id="final-level">Easy</div>
+                    <div class="result-label">Difficulty</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <p>Your typing level: <strong id="typing-level">Beginner</strong></p>
+        </div>
+
+        <div class="history-container" id="history-container">
+            <h3><i class="fas fa-history"></i> Test History (Persistent)</h3>
+            <div id="history-list">
+                <!-- History items will be added here -->
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> How to Use This Test</h3>
+            <ul>
+                <li>Select a difficulty level (Easy, Medium, Hard)</li>
+                <li>Click "Start Test" to begin the timer and start typing</li>
+                <li>Type the text exactly as shown above</li>
+                <li>Correct characters will turn green, incorrect ones will be red</li>
+                <li>The test will automatically end after 60 seconds</li>
+                <li>You can reset at any time or get a new text to practice</li>
+                <li>Your results are saved to a database and persist across sessions!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Sample texts for typing test with difficulty levels
+        const sampleTexts = {
+            easy: [
+                "The quick brown fox jumps over the lazy dog. This famous pangram contains every letter in the English alphabet. It is often used in typing practice and font demonstrations because it is simple and covers all letters.",
+                "Programming is the process of creating instructions for computers. Many languages exist for different purposes. Whether you are building websites, mobile apps, or software, learning to code opens many career opportunities.",
+                "The sky was blue with fluffy white clouds. Birds flew overhead as children played in the park below. It was a beautiful day that everyone wanted to spend outdoors enjoying the warm sunshine and fresh air.",
+                "Healthy eating involves consuming various foods that provide nutrients. These include proteins, carbs, and vitamins. A balanced diet is essential for maintaining good health and having enough energy throughout your day.",
+                "Music has the power to evoke emotions and memories. It serves as a universal language connecting people from different cultures. Whether you enjoy rock, pop, jazz, or classical music, there is something for everyone.",
+                "Books take us to different worlds and introduce us to new characters and ideas. Reading regularly improves vocabulary, reduces stress, and expands imagination. Libraries offer free access to thousands of books for everyone.",
+                "Exercise is important for physical and mental health. Regular activity helps strengthen muscles and bones while reducing the risk of diseases. Even a simple walk for thirty minutes each day can make a big difference.",
+                "Traveling to new places exposes us to different cultures and perspectives. Every destination has unique food, traditions, and attractions to explore. Adventure and learning go hand in hand when we visit unfamiliar lands.",
+                "Technology continues to change how we communicate and work. Smartphones, computers, and the internet have become essential tools in modern life. These tools help us stay connected with friends and family across the globe.",
+                "Gardening is a rewarding hobby that connects us with nature. Growing vegetables, flowers, or herbs provides fresh produce and beautiful scenery. Spending time in gardens reduces stress and brings peace to the mind.",
+                "Coffee is one of the most popular beverages in the world. Millions of people enjoy a warm cup every morning to start their day. Different brewing methods create unique flavors and experiences for coffee lovers.",
+                "The ocean covers most of Earth's surface and contains incredible marine life. Coral reefs, whales, and colorful fish create amazing underwater ecosystems. Protecting our oceans is crucial for the survival of many species.",
+                "Cooking is an art that combines creativity with basic techniques. Following recipes teaches precision while experimenting allows for personal flair. Home cooked meals are often healthier and more satisfying than fast food.",
+                "Movies and television shows provide entertainment and storytelling. From action and adventure to comedy and drama, there are genres for every taste. Watching films together brings people together and creates shared experiences.",
+                "Learning a new language opens doors to new cultures and opportunities. Speaking multiple languages improves job prospects and makes travel more enjoyable. Language learning takes patience and consistent practice to achieve fluency."
+            ],
+            medium: [
+                "The intricate mechanisms of quantum computing challenge traditional notions of binary processing. These advanced systems leverage superposition to perform calculations exponentially faster than classical computers. Understanding quantum mechanics requires substantial mathematical knowledge and abstract thinking about the nature of reality.",
+                "Neuroscience research reveals that neuroplasticity allows the brain to reorganize itself throughout life. This adaptability enables learning new skills and recovering from injuries through consistent practice. Synaptic connections strengthen with repetition, forming new neural pathways that support cognitive abilities.",
+                "Economic globalization has created interconnected markets across the world. Supply chains now span continents, creating complex dependencies between nations. International trade agreements facilitate commerce while environmental regulations attempt to balance growth with sustainability and resource conservation.",
+                "Ecological conservation requires balancing human development with environmental protection. Sustainable practices ensure resources for future generations while preserving biodiversity. Renewable energy sources and circular economy principles represent progress toward long-term environmental stability.",
+                "Literary analysis examines how authors employ symbolism to convey deeper meanings. Metaphors and allegories enrich texts with multiple layers of interpretation. Understanding theme, tone, and narrative structure provides insights into the author's intended message.",
+                "Artificial intelligence is reshaping industries from healthcare to manufacturing and transportation. Machine learning algorithms process vast amounts of data to identify patterns invisible to humans. Ethical considerations about privacy, bias, and job displacement accompany these technological advances.",
+                "Climate change presents unprecedented challenges requiring global cooperation and innovation. Rising temperatures affect weather patterns, agriculture, and sea levels worldwide. Scientists recommend transitioning to renewable energy and implementing sustainable practices urgently.",
+                "Digital marketing strategies leverage social media and analytics to reach targeted audiences. Content creation, search engine optimization, and paid advertising form a comprehensive approach. Businesses measure success through metrics like engagement, conversion rates, and return on investment.",
+                "The human brain processes approximately fifty thousand thoughts daily. Cognitive psychology explores how we perceive information, make decisions, and form memories. Understanding these mental processes improves learning techniques and mental health strategies.",
+                "Cybersecurity has become crucial as organizations face increasing digital threats. Encryption, firewalls, and multi-factor authentication protect sensitive data from unauthorized access. Educating employees about phishing and social engineering reduces vulnerability to attacks.",
+                "Renewable energy sources include solar, wind, hydroelectric, and geothermal power. These alternatives reduce dependence on fossil fuels and minimize greenhouse gas emissions. Technological improvements are making renewable energy increasingly cost-competitive with traditional sources.",
+                "Psychology investigates human behavior, motivation, and mental processes. Different therapeutic approaches address mental health issues ranging from anxiety to depression. Evidence-based treatments combining medication and counseling often prove most effective.",
+                "Urban planning shapes cities to be more livable, efficient, and sustainable. Green spaces, public transportation, and mixed-use development create vibrant communities. Smart city technology optimizes resource management and improves quality of life.",
+                "Blockchain technology underpins cryptocurrencies and enables secure, transparent transactions. Decentralized systems reduce reliance on intermediaries while creating immutable records. Applications extend beyond finance to supply chain management and voting systems.",
+                "Philosophy explores fundamental questions about existence, knowledge, and ethics. Different philosophical traditions offer varying perspectives on meaning and morality. Contemporary philosophy addresses modern challenges like artificial intelligence and biotechnology ethics."
+            ],
+            hard: [
+                "Phenomenological ontology examines the fundamental structures of consciousness and intentionality. Heidegger's Dasein analysis reveals the ontological difference between Being and beings, establishing framework for understanding existence. The hermeneutic circle demonstrates how interpretation involves circular relationship between part and whole.",
+                "Poststructuralist discourse challenges logocentric paradigms by deconstructing binary oppositions. Derridean différance undermines metaphysical presence through temporal deferral and spatial difference mechanisms. Trace structures within texts reveal instability of meaning and perpetual supplementarity.",
+                "Quantum chromodynamics describes the strong interaction between quarks and gluons. The color confinement principle explains why quarks are never observed in isolation. Asymptotic freedom demonstrates that quarks interact more weakly at higher energies.",
+                "Epistemological skepticism questions the possibility of certain knowledge and justification. Hume's problem of induction demonstrates the limitations of empirical reasoning and causal inference. Foundationalism and coherentism propose competing frameworks for understanding justified belief structures.",
+                "Neuropharmacological interventions modulate neurotransmitter systems to treat psychopathological conditions. Receptor agonism and antagonism alter synaptic transmission efficacy through biochemical mechanisms. Neurogenesis and synaptic plasticity enable pharmacological treatment of neurological disorders.",
+                "Complexity theory examines emergent phenomena arising from interactions within systems. Self-organization at critical transitions demonstrates nonlinear dynamics. Attractors and bifurcations characterize system behavior across multiple scales of organization.",
+                "Dialectical materialism provides framework for analyzing historical processes through contradiction and synthesis. Marx's analysis of capital accumulation reveals mechanisms of surplus value extraction. Historical materialism explains social formations through modes of production.",
+                "String theory postulates fundamental reality comprises vibrating one-dimensional objects. Compactification of extra dimensions enables connection with observable physics. Dualities between different formulations suggest underlying unity in physical theories.",
+                "Phenomenology investigates structures of conscious experience and intentional relations. Bracketing presuppositions enables examination of essence and meaning constitution. Intersubjectivity and embodiment challenge Cartesian dualism.",
+                "Gödel's incompleteness theorems establish fundamental limitations of formal systems. First theorem demonstrates any consistent system cannot prove all truths within itself. Second theorem shows formal systems cannot verify their own consistency.",
+                "Constructivism challenges objective realism by emphasizing role of observer in knowledge construction. Radical constructivism proposes knowledge represents viable adaptations rather than external reality. Educational constructivism informs pedagogical approaches emphasizing active learning.",
+                "Feminist epistemology critiques traditional approaches to knowledge production. Standpoint theory argues marginalized perspectives provide epistemic advantages. Situated knowledge challenges notion of disembodied, objective viewpoint.",
+                "Thermodynamics describes energy transformations and entropy increase in isolated systems. Second law establishes arrow of time through entropic irreversibility. Statistical mechanics provides microscopic foundation for macroscopic thermodynamic principles.",
+                "Postcolonial theory examines power dynamics embedded within colonial discourse. Subaltern studies reveal voices and perspectives silenced by hegemonic narratives. Decolonization efforts challenge persistent structural inequalities.",
+                "Autopoietic systems are self-producing, self-maintaining entities with organizational closure. Viability depends on structural coupling with environment while maintaining autonomy. Autopoiesis extends beyond biology to examine organizational and social systems."
+            ]
+        };
+
+        // DOM elements
+        const textDisplay = document.getElementById('text-display');
+        const typingInput = document.getElementById('typing-input');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const newTextBtn = document.getElementById('new-text-btn');
+        const wpmDisplay = document.getElementById('wpm');
+        const accuracyDisplay = document.getElementById('accuracy');
+        const timerDisplay = document.getElementById('timer');
+        const resultContainer = document.getElementById('result-container');
+        const finalWpm = document.getElementById('final-wpm');
+        const finalAccuracy = document.getElementById('final-accuracy');
+        const typingLevel = document.getElementById('typing-level');
+        const progressBar = document.getElementById('progress');
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        const finalLevel = document.getElementById('final-level');
+        const historyContainer = document.getElementById('history-container');
+        const historyList = document.getElementById('history-list');
+
+        // App state
+        let currentText = '';
+        let timer;
+        let timeLeft = 60;
+        let startTime;
+        let totalChars = 0;
+        let correctChars = 0;
+        let testActive = false;
+        let originalText = '';
+        let currentDifficulty = 'easy';
+
+        // Initialize the app
+        function init() {
+            loadRandomText(currentDifficulty);
+            typingInput.value = '';
+            resetBtn.disabled = true;
+            timerDisplay.textContent = timeLeft;
+            wpmDisplay.textContent = '0';
+            accuracyDisplay.textContent = '100%';
+            resultContainer.style.display = 'none';
+            typingInput.disabled = true;
+            historyContainer.style.display = 'none';
+            loadHistory();
+        }
+
+        // Load a random text for selected difficulty
+        function loadRandomText(difficulty) {
+            const texts = sampleTexts[difficulty];
+            const randomIndex = Math.floor(Math.random() * texts.length);
+            currentText = texts[randomIndex];
+            originalText = currentText;
+
+            // Update text display class based on difficulty
+            textDisplay.className = 'text-display';
+            if (difficulty === 'hard') {
+                textDisplay.classList.add('hard');
+            }
+
+            displayText();
+        }
+
+        // Display the text with formatting
+        function displayText() {
+            textDisplay.innerHTML = '';
+            currentText.split('').forEach(char => {
+                const charSpan = document.createElement('span');
+                charSpan.innerText = char;
+                textDisplay.appendChild(charSpan);
+            });
+        }
+
+        // Set difficulty level
+        function setDifficulty(level) {
+            currentDifficulty = level;
+
+            // Update UI
+            difficultyButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.level === level) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Reset test if not active
+            if (!testActive) {
+                loadRandomText(level);
+            }
+        }
+
+        // Start the typing test
+        function startTest() {
+            if (testActive) return;
+
+            testActive = true;
+            timeLeft = 60;
+            totalChars = 0;
+            correctChars = 0;
+            startBtn.disabled = true;
+            resetBtn.disabled = false;
+            typingInput.disabled = false;
+            typingInput.value = '';
+            typingInput.focus();
+            resultContainer.style.display = 'none';
+            historyContainer.style.display = 'none';
+
+            // Set up timer
+            timerDisplay.textContent = timeLeft;
+            startTime = new Date();
+
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    endTest();
+                }
+            }, 1000);
+
+            displayText();
+        }
+
+        // Reset the test
+        function resetTest() {
+            clearInterval(timer);
+            testActive = false;
+            timeLeft = 60;
+            startBtn.disabled = false;
+            resetBtn.disabled = true;
+            typingInput.disabled = true;
+            typingInput.value = '';
+            wpmDisplay.textContent = '0';
+            accuracyDisplay.textContent = '100%';
+            timerDisplay.textContent = timeLeft;
+            resultContainer.style.display = 'none';
+            historyContainer.style.display = 'none';
+            loadRandomText(currentDifficulty);
+        }
+
+        // End the test
+        function endTest() {
+            clearInterval(timer);
+            testActive = false;
+            startBtn.disabled = false;
+            typingInput.disabled = true;
+
+            const endTime = new Date();
+            const timeTaken = (endTime - startTime) / 1000; // in seconds
+            const minutes = timeTaken / 60;
+
+            // Calculate WPM (words per minute)
+            const wordsTyped = totalChars / 5;
+            const wpm = Math.round(wordsTyped / minutes);
+
+            // Calculate accuracy
+            const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+
+            // Display final results
+            finalWpm.textContent = wpm;
+            finalAccuracy.textContent = accuracy + '%';
+            finalLevel.textContent = currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1);
+
+            // Determine typing level
+            let level = '';
+            if (wpm < 30) level = 'Beginner';
+            else if (wpm < 45) level = 'Intermediate';
+            else if (wpm < 65) level = 'Advanced';
+            else level = 'Expert';
+
+            typingLevel.textContent = level;
+
+            // Set progress bar (based on WPM, max 100)
+            const progressWidth = Math.min(wpm, 100);
+            progressBar.style.width = progressWidth + '%';
+
+            resultContainer.style.display = 'block';
+
+            // Save to history and display
+            saveToHistory(wpm, accuracy, currentDifficulty);
+            loadHistory();
+        }
+
+        // Save test results to history
+        function saveToHistory(wpm, accuracy, difficulty) {
+            // Send data to backend
+            fetch('/save_result', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    wpm: wpm,
+                    accuracy: accuracy,
+                    difficulty: difficulty
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Result saved:', data);
+            })
+            .catch(error => {
+                console.error('Error saving result:', error);
+            });
+        }
+
+        // Load test history from server
+        function loadHistory() {
+            fetch('/get_history')
+            .then(response => response.json())
+            .then(data => {
+                displayHistory(data);
+            })
+            .catch(error => {
+                console.error('Error loading history:', error);
+            });
+        }
+
+        // Display test history
+        function displayHistory(historyData) {
+            historyList.innerHTML = '';
+
+            if (historyData.length === 0) {
+                historyList.innerHTML = '<p>No test history yet. Complete a test to see results here.</p>';
+                historyContainer.style.display = 'block';
+                return;
+            }
+
+            historyData.forEach(entry => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div><span class="history-wpm">${entry.wpm} WPM</span> | ${entry.accuracy}% Accuracy</div>
+                    <div>${entry.difficulty.charAt(0).toUpperCase() + entry.difficulty.slice(1)} | ${entry.timestamp}</div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+
+            historyContainer.style.display = 'block';
+        }
+
+        // Handle typing input
+        function handleInput() {
+            if (!testActive) return;
+
+            const input = typingInput.value;
+            totalChars = input.length;
+
+            // Update displayed text with formatting
+            const textSpans = textDisplay.querySelectorAll('span');
+
+            // Reset all spans
+            textSpans.forEach(span => {
+                span.classList.remove('correct', 'incorrect', 'current');
+            });
+
+            // Process each character
+            let newCorrectChars = 0;
+
+            input.split('').forEach((char, index) => {
+                if (index < textSpans.length) {
+                    if (char === originalText[index]) {
+                        textSpans[index].classList.add('correct');
+                        newCorrectChars++;
+                    } else {
+                        textSpans[index].classList.add('incorrect');
+                    }
+                }
+            });
+
+            // Highlight current character
+            if (input.length < originalText.length) {
+                textSpans[input.length].classList.add('current');
+            }
+
+            correctChars = newCorrectChars;
+
+            // Calculate and display stats in real-time
+            const currentTime = new Date();
+            const timeTaken = (currentTime - startTime) / 1000; // in seconds
+            const minutes = timeTaken / 60;
+
+            // Calculate WPM
+            const wordsTyped = totalChars / 5;
+            const wpm = Math.round(wordsTyped / minutes);
+            wpmDisplay.textContent = wpm;
+
+            // Calculate accuracy
+            const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+            accuracyDisplay.textContent = accuracy + '%';
+
+            // Automatically end test if all text is typed
+            if (input.length >= originalText.length) {
+                endTest();
+            }
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', startTest);
+        resetBtn.addEventListener('click', resetTest);
+        newTextBtn.addEventListener('click', () => {
+            if (!testActive) {
+                loadRandomText(currentDifficulty);
+            }
+        });
+        typingInput.addEventListener('input', handleInput);
+
+        // Add event listeners for difficulty buttons
+        difficultyButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setDifficulty(btn.dataset.level);
+            });
+        });
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
