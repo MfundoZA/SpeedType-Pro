@@ -653,6 +653,8 @@
         function startTest() {
             if (testActive) return;
 
+        scrollToTestStats();
+
             testActive = true;
             timeLeft = 60;
             totalChars = 0;
@@ -680,6 +682,20 @@
 
             displayText();
         }
+
+      // At the start of the test ensures user stats are visible on the screen
+      // while typing
+      function scrollToTestStats() {
+        const statsContainer = document.querySelector(".stats-container");
+
+        // Scroll to it if it exists
+        if (statsContainer) {
+          statsContainer.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }
 
         // Reset the test
         function resetTest() {
