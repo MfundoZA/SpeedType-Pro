@@ -653,7 +653,7 @@
         function startTest() {
             if (testActive) return;
 
-        scrollToTestStats();
+            scrollToTestStats();
 
             testActive = true;
             timeLeft = 60;
@@ -683,19 +683,19 @@
             displayText();
         }
 
-      // At the start of the test ensures user stats are visible on the screen
-      // while typing
-      function scrollToTestStats() {
-        const statsContainer = document.querySelector(".stats-container");
+        // At the start of the test ensures user stats are visible on the screen
+        // while typing
+        function scrollToTestStats() {
+            const statsContainer = document.querySelector(".stats-container");
 
-        // Scroll to it if it exists
-        if (statsContainer) {
-          statsContainer.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
+            // Scroll to it if it exists
+            if (statsContainer) {
+            statsContainer.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+            }
         }
-      }
 
         // Reset the test
         function resetTest() {
@@ -709,11 +709,11 @@
             wpmDisplay.textContent = '0';
             accuracyDisplay.textContent = '100%';
             timerDisplay.textContent = timeLeft;
-        resultContainer.style.display = 'none';
+            resultContainer.style.display = 'none';
             loadRandomText(currentDifficulty);
 
-        // Called here to display latest test in history if clicked after a test was completed
-        loadHistory();
+            // Called here to display latest test in history if clicked after a test was completed
+            loadHistory();
         }
 
         // End the test
